@@ -1,4 +1,5 @@
 const pool = require('../database/connection');
+const client = require('../routes/client');
 
 async function clientCreate(cpf, name, tel) {
     const query = "INSERT INTO client (cpf, name, tel, point) VALUES (?, ?, ?, 0)";
@@ -41,7 +42,33 @@ async function clientList() {
     }
 }
 
+async function clientSerach(cpf) {
+    try {
+        const query = "SELECT * FROM client WHERE cpf = ?";
+
+        const [result] = await pool.query(query, [cpf])
+        
+        if (!result || result == null, result == 0, result == undefined) {
+            return {
+                success: false,
+                error: ["Não existe cliente cadastrado para o cpf informado"]
+            }
+        }
+
+        return {
+            success: true,
+            message: result 
+        }
+    } catch (error) {
+        return {
+            success: false,
+            error: ["Erro ao buscar cliente, por favor contate o administrador"]
+        }
+    }
+}
+
 module.exports = {
     clientCreate,
-    clientList
+    clientList,
+    clientSerach
 }
