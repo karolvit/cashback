@@ -3,10 +3,17 @@ const http = require('http');
 const WebSocket = require('ws');
 const { initializeVenom } = require('./src/utils/wpp/conf');
 const dotenv = require('dotenv').config();
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const main = require('./src/main')
 
 const app = express();
 const server = http.createServer(app);
 const port = process.env.SERVER_PORT || 3000;
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cors());
+app.use(express.json());
 
 const wss = new WebSocket.Server({ server });
 
