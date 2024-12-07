@@ -8,7 +8,6 @@ const main = express();
 
 main.use(bodyParser.json());
 main.use(cors());
-main.use(crypt)
 main.use(bodyParser.urlencoded({ extended: true }));
 main.use(router)
 
