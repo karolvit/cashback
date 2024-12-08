@@ -14,6 +14,7 @@ const port = process.env.SERVER_PORT || 3000;
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 app.use(express.json());
+app.use(main);
 
 const wss = new WebSocket.Server({ server });
 
