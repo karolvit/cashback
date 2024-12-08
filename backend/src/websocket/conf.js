@@ -3,7 +3,7 @@ module.exports = (ws) => {
   
     ws.send(JSON.stringify({ message: 'Bem-vindo ao WebSocket!' }));
   
-    ws.on('message', (message) => {
+    ws.on('Successfully connected', (message) => {
       console.log('Mensagem recebida:', message);
       ws.send(`Você disse: ${message}`);
     });

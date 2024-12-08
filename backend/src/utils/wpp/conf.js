@@ -9,6 +9,10 @@ function initializeVenom() {
           session: "apizap",
           multidevice: true,
           headless: true,
+          launch: {
+            args: ['--no-sandbox', '--disable-setuid-sandbox'],
+            timeout: 60000,
+          }
         },
         (base64Qr, asciiQr) => {
           global.qrCode = base64Qr; 
