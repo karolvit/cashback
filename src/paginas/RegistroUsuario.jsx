@@ -1,9 +1,10 @@
 import styled, { createGlobalStyle } from "styled-components";
-
 import { useState, useEffect } from "react";
 import apiAcai from "../axios/config.js";
 import Modal from "react-modal";
-
+import { usuarioSchema } from "../utils/validador.js";
+import * as yup from "yup";
+import { toast } from "react-toastify";
 const GlobalStyle = createGlobalStyle`
   * {
     margin: 0;
@@ -169,10 +170,28 @@ const PaginacaoBotao = styled.button`
     transition: 0.3s;
   }
 `;
+
+const Spinner = styled.div`
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid #73287d;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+`;
 const Usuarios = () => {
   const [usuarios, setUsuarios] = useState([]);
   const [modalAberto, setModalAberto] = useState(false);
-  const [nome, setNome] = useState("");
+  const [name, setName] = useState("");
   const [cpf, setCpf] = useState("");
   const [tel, setTel] = useState("");
   const [pesquisa, setPesquisa] = useState("");
@@ -203,24 +222,62 @@ const Usuarios = () => {
   const fecharModal = () => {
     setModalAberto(false);
   };
+  const handleChange = (e) => {
+    const value = e.target.value;
+    setCpf(formatCPF(value));
+  };
+
+  const formatCPF = (value) => {
+    const numericValue = value.replace(/\D/g, "");
+    return numericValue
+      .replace(/^(\d{3})(\d)/, "$1.$2")
+      .replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
+      .replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3-$4");
+  };
+  const formatarCPF = (cpf) => {
+    if (!cpf) return "";
+    const apenasNumeros = cpf.replace(/\D/g, "");
+    return apenasNumeros.replace(
+      /^(\d{3})(\d{3})(\d{3})(\d{2})$/,
+      "$1.$2.$3-$4"
+    );
+  };
+
+  const formatarTelefone = (telefone) => {
+    if (!telefone) return "";
+    const apenasNumeros = telefone.replace(/\D/g, "");
+    if (apenasNumeros.length === 10) {
+      return apenasNumeros.replace(/(\d{2})(\d{4})(\d{4})/, "($1)$2-$3");
+    } else if (apenasNumeros.length === 11) {
+      return apenasNumeros.replace(/(\d{2})(\d{5})(\d{4})/, "($1)$2-$3");
+    }
+    return telefone;
+  };
 
   const cadastrarUsuario = async (e) => {
     e.preventDefault();
+    const cpfSemFormatacao = cpf.replace(/\D/g, "");
+
+    const dados = { name, cpf: cpfSemFormatacao, tel };
+
+    setEnviando(true);
 
     try {
-      setEnviando(true);
-      const usuarioCadastro = {
-        cpf,
-        nome,
-        tel,
-      };
-      const res = await apiAcai.post("/client/insert", usuarioCadastro);
+      await usuarioSchema.validate(dados, { abortEarly: false });
+      const res = await apiAcai.post("/client/insert", dados);
       if (res.status === 201) {
         window.location.reload();
         fecharModal();
       }
+      console.log("Dados válidos:", dados);
     } catch (error) {
-      console.log(error);
+      if (error instanceof yup.ValidationError) {
+        error.inner.forEach((err) => {
+          toast.error(err.message);
+        });
+      }
+    } finally {
+      setEnviando(false);
     }
   };
 
@@ -291,17 +348,18 @@ const Usuarios = () => {
                     <input
                       type="text"
                       placeholder="Nome do Cliente"
-                      value={nome}
-                      onChange={(e) => setNome(e.target.value)}
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
                     />
                   </Form1>
                   <Form1>
                     <label>CPF</label>
                     <input
+                      mask="999.999.999-99"
                       type="text"
                       placeholder="CPF do cliente"
                       value={cpf}
-                      onChange={(e) => setCpf(e.target.value)}
+                      onChange={handleChange}
                     />
                   </Form1>
                 </Form>
@@ -318,7 +376,7 @@ const Usuarios = () => {
                 </Form>
                 <ButaoEnvioUsuario>
                   {enviando ? (
-                    "Aguarde..."
+                    <Spinner />
                   ) : (
                     <input
                       type="submit"
@@ -342,8 +400,8 @@ const Usuarios = () => {
               {usuariosExibidos.map((usuario) => (
                 <tr key={usuario.cpf}>
                   <td>{usuario.name}</td>
-                  <td>{usuario.cpf}</td>
-                  <td>{usuario.tel}</td>
+                  <td>{formatarCPF(usuario.cpf)}</td>
+                  <td>{formatarTelefone(usuario.tel)}</td>
                 </tr>
               ))}
             </tbody>

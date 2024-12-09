@@ -6,7 +6,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { AnimatePresence } from "framer-motion";
 import RegistroUsuario from "./RegistroUsuario";
-import Parametros from "./parametros";
+import Parametros from "./Parametros";
 //import { WebSocketContext } from "../context/WebSocketContext";
 //import QRCode from "react-qr-code";
 

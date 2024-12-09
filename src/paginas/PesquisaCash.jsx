@@ -4,6 +4,7 @@ import apiAcai from "../axios/config.js";
 import { useState } from "react";
 import usuario from "../assets/img/user.png";
 import Switch from "react-switch";
+import { toast } from "react-toastify";
 
 const GlobalStyle = createGlobalStyle`
   body {
@@ -101,14 +102,14 @@ const Button = styled.input`
   width: 100%;
   margin-top: 40px;
   padding: 12px 90px;
-  background-color: #5f387a;
-  border: 1px solid #5f387a;
+  background-color: #73287d;
+  border: 1px solid #73287d;
   color: #f1f1f1;
   cursor: pointer;
   transition: 0.5s;
 
   &:hover {
-    background-color: #46225b;
+    background-color: #8b43bb;
     border-radius: 50px;
   }
 `;
@@ -117,6 +118,45 @@ const Message = styled.div`
   margin-top: 20px;
   font-size: 18px;
   color: ${({ success }) => (success ? "green" : "red")};
+`;
+
+const Spinner = styled.div`
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid #73287d;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+`;
+const ButaoEnvioUsuario = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+  input {
+    width: 100%;
+    margin-top: 40px;
+
+    padding: 12px 90px;
+    background-color: #73287d;
+    border: 1px solid #73287d;
+    color: #f1f1f1;
+    cursor: pointer;
+    transition: 0.5s;
+  }
+  input:hover {
+    background-color: #8b43bb;
+    border-radius: 50px;
+    transition: 1s;
+  }
 `;
 
 const PesquisaCash = () => {
@@ -130,6 +170,7 @@ const PesquisaCash = () => {
   const [proxComponent, setproxComponent] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const [vpoint, setVpoint] = useState("");
+  const [enviando, setEnviando] = useState(false);
 
   const handleSwitchChange = (checked) => {
     setIsChecked(checked);
@@ -142,6 +183,22 @@ const PesquisaCash = () => {
       .replace(/^(\d{3})(\d)/, "$1.$2")
       .replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
       .replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3-$4");
+  };
+
+  const formatCashback = (value) => {
+    const numericValue = value.replace(/\D/g, "");
+    const formattedValue = (parseInt(numericValue) / 100).toFixed(2);
+    return formattedValue.replace(".", ".");
+  };
+
+  const varificarVpoint = (e) => {
+    const value = e.target.value;
+    setVpoint(formatCashback(value));
+  };
+
+  const varificarVrecebido = (e) => {
+    const value = e.target.value;
+    setRecebido(formatCashback(value));
   };
 
   const handleChange = (e) => {
@@ -193,12 +250,15 @@ const PesquisaCash = () => {
         vpoint,
         bp,
       };
+      setEnviando(true);
       const res = await apiAcai.post("/order/create", dadosPedido);
-      if (res.status === 201) {
+      if (res.status === 200) {
         window.location.reload();
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setEnviando(false);
     }
   };
 
@@ -238,7 +298,7 @@ const PesquisaCash = () => {
                 <Label>Pontos</Label>
                 <Input
                   type="text"
-                  value={cpf}
+                  value={point}
                   onChange={(e) => setPoint(e.target.value)}
                   disabled
                 />
@@ -250,26 +310,26 @@ const PesquisaCash = () => {
               <form onSubmit={(e) => enviarPedido(e)}>
                 <Form>
                   <p>Dados do pedido:</p>
-                  <Label htmlFor="cpf">Valor do pedido</Label>
+                  <Label>Valor do pedido</Label>
                   <Input
-                    type="number"
+                    type="text"
                     name="pedido"
                     placeholder="Valor do pedido do cliente"
                     value={recebido}
-                    onChange={(e) => setRecebido(e.target.value)}
+                    onChange={varificarVrecebido}
                   />
                 </Form>
                 <Form>
                   <Label>Cashback utlizado</Label>
                   <Input
-                    type="number"
+                    type="text"
                     name="pedido"
                     placeholder="Valor utilizado pelo cliente"
                     value={vpoint}
-                    onChange={(e) => setVpoint(e.target.value)}
+                    onChange={varificarVpoint}
                   />
                 </Form>
-                <Label>Cliente utiliza cashback? `</Label>
+                <Label>Cliente utiliza cashback? </Label>
                 <Switch
                   onChange={handleSwitchChange}
                   checked={isChecked}
@@ -283,7 +343,18 @@ const PesquisaCash = () => {
                   height={20}
                   width={48}
                 />
-                <Button type="submit" value="Enviar " />
+
+                <ButaoEnvioUsuario>
+                  {enviando ? (
+                    <Spinner />
+                  ) : (
+                    <input
+                      type="submit"
+                      value="Cadastrar cliente"
+                      disabled={enviando}
+                    />
+                  )}
+                </ButaoEnvioUsuario>
               </form>
             </LoginForm>
           </LoginContainer>

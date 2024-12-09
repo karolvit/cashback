@@ -10,6 +10,7 @@ import RegistroUsuario from "./paginas/RegistroUsuario.jsx";
 import PesquisaCash from "./paginas/PesquisaCash.jsx";
 import Home from "./paginas/Home.jsx";
 import { WebSocketProvider } from "./context/WebSocketContext.jsx";
+
 const router = createBrowserRouter([
   {
     path: "/",

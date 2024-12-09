@@ -2,6 +2,7 @@ import logo from "../assets/img/logo.jpg";
 import { useSelector, useDispatch } from "react-redux";
 import { login } from "../slices/authSlice";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 import styled, { createGlobalStyle } from "styled-components";
 const GlobalStyle = createGlobalStyle`
@@ -146,6 +147,11 @@ const Login = () => {
   useEffect(() => {
     if (error) {
       console.log(error);
+    }
+  }, [error]);
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
     }
   }, [error]);
 
