@@ -4,7 +4,7 @@ import apiAcai from "../axios/config.js";
 import { useState } from "react";
 import usuario from "../assets/img/user.png";
 import Switch from "react-switch";
-import { toast } from "react-toastify";
+//import { toast } from "react-toastify";
 
 const GlobalStyle = createGlobalStyle`
   body {
@@ -200,6 +200,11 @@ const PesquisaCash = () => {
     const value = e.target.value;
     setRecebido(formatCashback(value));
   };
+  const verificarBp = () => {
+    const inativo = parseFloat(bp) === 1;
+
+    return inativo;
+  };
 
   const handleChange = (e) => {
     const value = e.target.value;
@@ -327,6 +332,7 @@ const PesquisaCash = () => {
                     placeholder="Valor utilizado pelo cliente"
                     value={vpoint}
                     onChange={varificarVpoint}
+                    disabled={!verificarBp()}
                   />
                 </Form>
                 <Label>Cliente utiliza cashback? </Label>
