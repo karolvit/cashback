@@ -139,6 +139,7 @@ const Parametros = () => {
 
       if (res.status === 200) {
         console.log(res.data);
+        window.location.reload();
 
         //toast.success(res.data.message[0]);
       }

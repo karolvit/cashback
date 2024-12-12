@@ -4,7 +4,7 @@ import apiAcai from "../axios/config.js";
 import { useState } from "react";
 import usuario from "../assets/img/user.png";
 import Switch from "react-switch";
-//import { toast } from "react-toastify";
+import { toast } from "react-toastify";
 
 const GlobalStyle = createGlobalStyle`
   body {
@@ -261,7 +261,7 @@ const PesquisaCash = () => {
         window.location.reload();
       }
     } catch (error) {
-      console.log(error);
+      toast.error(error.response.data.error[0]);
     } finally {
       setEnviando(false);
     }

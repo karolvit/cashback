@@ -138,7 +138,7 @@ const SideBar = ({ onMenuClick }) => {
             </>
           </Container2>
           <Footer>
-            <p>Versão 1.0.0</p>
+            <p>Versão 1.0.1</p>
           </Footer>
         </SideBarClass>
         <MainContainer></MainContainer>
